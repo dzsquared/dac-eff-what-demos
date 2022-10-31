@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DeploymentReport xmlns="http://schemas.microsoft.com/sqlserver/dac/DeployReport/2012/02">
+	<Alerts>
+		<Alert Name="DataMotion">
+			<Issue Value="[SalesLT].[SalesOrderDetails]" />
+		</Alert>
+	</Alerts>
+	<Operations>
+		<Operation Name="TableRebuild">
+			<Item Value="[SalesLT].[SalesOrderDetails]" Type="SqlTable" />
+		</Operation>
+		<Operation Name="Create">
+			<Item Value="[dbo].[BuildVersion]" Type="SqlTable" />
+			<Item Value="[dbo].[DF_BuildVersion_ModifiedDate]" Type="SqlDefaultConstraint" />
+			<Item Value="[SalesLT].[CK_SalesOrderDetail_UnitPriceDiscount]" Type="SqlCheckConstraint" />
+			<Item Value="[SalesLT].[SalesOrderDetails].[IX_SalesOrderDetail_ProductID]" Type="SqlIndex" />
+			<Item Value="[SalesLT].[FK_SalesOrderDetail_Product_ProductID]" Type="SqlForeignKeyConstraint" />
+			<Item Value="[SalesLT].[FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID]" Type="SqlForeignKeyConstraint" />
+			<Item Value="[SalesLT].[CK_SalesOrderDetail_OrderQty]" Type="SqlCheckConstraint" />
+			<Item Value="[SalesLT].[CK_SalesOrderDetail_UnitPrice]" Type="SqlCheckConstraint" />
+		</Operation>
+		<Operation Name="Drop">
+			<Item Value="[SalesLT].[DF_SalesOrderDetail_ModifiedDate]" Type="SqlDefaultConstraint" />
+			<Item Value="[SalesLT].[DF_SalesOrderDetail_rowguid]" Type="SqlDefaultConstraint" />
+			<Item Value="[SalesLT].[FK_SalesOrderDetail_Product_ProductID]" Type="SqlForeignKeyConstraint" />
+			<Item Value="[SalesLT].[FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID]" Type="SqlForeignKeyConstraint" />
+		</Operation>
+	</Operations>
+</DeploymentReport>
