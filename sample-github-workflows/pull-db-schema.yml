@@ -1,0 +1,56 @@
+name: validate database state
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate-db:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2
+        
+      - name: 'Remove existing database deconstruction'
+        run: rm -f -r deployeddb.dacpac
+
+      # extract the database schema from the database into a folder called deployeddb.dacpac, organizing the files by objecttype folders
+      - name: 'Deconstruct database'
+        run: |
+          sqlpackage /Action:Extract /SourceConnectionString:"${{ secrets.AZURE_SQL }}" /TargetFile:"deployeddb.dacpac" /p:ExtractTarget=ObjectType
+
+      # compare the contents of the deployeddb.dacpac folder to the previous contents of the folder
+      - name: Check for changes
+        id: get_changes
+        run: echo "::set-output name=changed::$(git status --porcelain | wc -l)"
+
+      # if there are changes commit and push to a branch called "db-deconstruction"
+      - name: Process changes
+        if: steps.get_changes.outputs.changed != 0
+        run: |
+          git config --global user.email "dbbot@email.com"
+          git config --global user.name "Database Status Bot"
+          git switch -c db-deconstruction
+          git add deployeddb.dacpac
+          git commit -m "Update database deconstruction"
+          git push -u origin db-deconstruction
+
+      # open pull request if there were changes
+      - name: pull request
+        id: pull_request
+        if: steps.get_changes.outputs.changed != 0
+        uses: vsoch/pull-request-action@1.0.19
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_FROM_BRANCH: "db-deconstruction"
+          PULL_REQUEST_BRANCH: "main"
+          PULL_REQUEST_TITLE: "Update database state"
+
+      - name: 'output summary with PR link'
+        if: steps.get_changes.outputs.changed != 0
+        run: |
+          echo "### :bell: New pull request ${{ steps.pull_request.outputs.pull_request_url }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'output summary with no changes'
+        if: steps.get_changes.outputs.changed == 0
+        run: |
+          echo "### :tada: No database drift detected" >> $GITHUB_STEP_SUMMARY

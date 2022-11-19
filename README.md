@@ -4,6 +4,7 @@ Dac Eff What is a presentation that touches on the capabilities of the Data-Tier
 
 ## Included Samples
 - [XML Deploy Report](./deploy-report)
+- [Sample GitHub workflows](./sample-github-workflows)
 - [SqlPackage Deployment Contributor](./contributor)
 - [Schema Compare with DacFx API](./schema-compare)
 
